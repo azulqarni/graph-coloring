@@ -275,12 +275,10 @@ int copyColors (Graph *G, Graph *H, int i) {
 }
 
 int kColor (int k, Graph *G, int i) {
-
     static int failure = 0;
     failure ^= G == G->ancestor ? failure : 0;
 
     if (k <= 2) {
-
         failure |= twoColor (G, i);
         return failure ? 0 : 2;
     }
