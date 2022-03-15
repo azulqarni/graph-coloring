@@ -199,7 +199,6 @@ Graph *subgraphInduced (Graph *G, int N) {
     subgraph->numVertices = N;
     int i = 0;
     for (i = 0; i < N; i++) {
-
         Node *p = G->vertex[adj[i].index].adjList;
         for (subgraph->vertex[i].label = adj[i].label; p; p = p->next) {
             int idx = binarySearch (adj, 0, N - 1, p->label);
@@ -246,11 +245,9 @@ int bruteForceColor (Graph *G, int i) {
     int *freq = scalloc (1 + N, sizeof (int), 1);
     for (j = 0; j < n; j++) {
         if (0 == G->vertex[j].color) {
-
             Node *p = G->ancestor->vertex[G->vertex[j].label].adjList;
             memset (1 + freq, 0, N * sizeof (int));
             for (; p; ++freq[G->ancestor->vertex[p->label].color], p = p->next);
-
             for (k = 1; k < 1 + i && k < N; k++)
                 if (0 == freq[k])
                     break;
@@ -268,7 +265,6 @@ int copyColors (Graph *G, Graph *H, int i) {
     int j, freq[2] = {0};
     Node *adj = G->adjArray;
     for (j = 0; j < H->numVertices; j++) {
-
         if (0 == G->vertex[adj[j].index].color) {
             G->ancestor->vertex[adj[j].label].color = H->vertex[j].color;
             G->vertex[adj[j].index].color = H->vertex[j].color;
