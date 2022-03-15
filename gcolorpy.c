@@ -2,7 +2,7 @@
  ============================================================================
  Name        : gcolorpy.c
  Author      : Asim
- Version     : Python wrapper compatible version
+ Version     : Python Wrapper Compatible Version
  Copyright   : All rights reserved
  Description : Graph Coloring in C, Ansi-style
  ============================================================================

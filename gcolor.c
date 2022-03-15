@@ -2,7 +2,7 @@
  ============================================================================
  Name        : gcolor.c
  Author      : Asim
- Version     : Standalone Adjacency List-based
+ Version     : Standalone Adjacency List-based Implementation
  Copyright   : All rights reserved
  Description : Graph Coloring in C, Ansi-style
  ============================================================================
