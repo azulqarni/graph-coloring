@@ -5,7 +5,7 @@ if [[ $1 = "clean" ]]; then
     exit
 fi
 
-set +v
+set -v
 echo Compiling...
 for file in gcolor gcolorpy graphgen; do
     gcc -Wall -O3 -o $file{,.c} -lm
