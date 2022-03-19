@@ -2,7 +2,7 @@
 This is a Wigderson’s approximate graph coloring algorithm implementation along with a Python wrapper file for invocation of the algorithm's C implementation.
 
 - `graphgen.c` containts the code for the production of a random input graph with number of vertices specified by the first argument passed to the executable.
-- `gcolor.c` contains the algorithm imlementation in C accepting a graph that is stored in a adjacent list format. In each of the input graphs, vertices are numbered from 1 to |V|. Each row includes a vertex, followed by zero or more other vertices. For example:<br /><br />
+- `gcolor.c` contains the algorithm imlementation in C accepting a graph that is stored in a adjacent list format. In each of the input graphs, vertices are numbered from 1 to |V|. Each row includes a vertex, followed by zero or more other vertices. For example:\\
 1 3 6<br />
 2 3 5<br />
 3 1 2 4 5<br />
