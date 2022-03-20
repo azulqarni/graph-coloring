@@ -7,9 +7,9 @@ fi
 
 set -v
 echo Compiling...
-gcc -Wall -O3 -DATTACH -o gcolorpy gcolor.c -lm
-gcc -Wall -O3 -o gcolor gcolor.c -lm
-gcc -Wall -O3 -o graphgen graphgen.c
+gcc -Wall -O3 -DATTACH -o gcolor{py,.c} -lm
+gcc -Wall -O3 -o gcolor{,.c} -lm
+gcc -Wall -O3 -o graphgen{,.c}
 echo Done.
 
 echo Producing test input...
