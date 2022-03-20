@@ -7,9 +7,9 @@ fi
 
 set -v
 echo Compiling...
-for file in gcolor gcolorpy graphgen; do
-    gcc -Wall -O3 -o $file{,.c} -lm
-done
+gcc -Wall -O3 -DATTACH -o gcolorpy gcolor.c -lm
+gcc -Wall -O3 -o gcolor gcolor.c -lm
+gcc -Wall -O3 -o graphgen graphgen.c
 echo Done.
 
 echo Producing test input...

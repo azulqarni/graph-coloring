@@ -24,6 +24,13 @@
      __typeof__ (b) _b = (b); \
      _a < _b ? _a : _b; })
 
+#ifndef ATTACH
+#define ATTACH 0
+#else
+#undef  ATTACH
+#define ATTACH 1
+#endif
+
 void *scalloc (int len, size_t size, const char fun) {
     void *p = fun ? malloc (len * size) : calloc (len, size);
     if (!p) {
@@ -69,6 +76,9 @@ typedef struct Graph {
 
 clock_t begin;
 void timeTaken (void) {
+#if ATTACH
+    return;
+#endif
     clock_t end = clock ();
     printf("Time taken = %lf\n", ((double) end - begin) / CLOCKS_PER_SEC);
 }
@@ -149,7 +159,6 @@ int reshapeAdjList (Graph *graph, int n, int m) {
 }
 
 void addEdge (Graph* graph, int s, int d, int idx) {
-
     Node* newNode = createNode (d, idx);
     newNode->next = graph->vertex[s].adjList;
     graph->vertex[s].adjList = newNode;
@@ -163,9 +172,9 @@ void printColors (int colors, Graph* G) {
         int i, current = 0;
         for (i = 0; i < G->numVertices; i++) {
             if (G->vertex[i].color == current) {
-                printf (" %d", 1 + G->vertex[i].label);
+                printf (" %d", !ATTACH + G->vertex[i].label);
             } else {
-                printf ("\n%d", 1 + G->vertex[i].label);
+                printf ("\n%d", !ATTACH + G->vertex[i].label);
                 current = G->vertex[i].color;
             }
         }
@@ -205,7 +214,6 @@ int BFS (Graph *G, int V, int offset) {
                 G->ancestor->vertex[p->label].color = offset + 1 - vtx.label;
                 enQueue (q, 1 - vtx.label, p->index);
             } else if (offset + vtx.label == G->vertex[p->index].color) {
-
                 for (; q->front; deQueue (q));
                 return failure = 1;
             }
@@ -223,7 +231,7 @@ int twoColor (Graph *G, int i) {
     return failure;
 }
 
-int bruteForceColor (Graph *G, int i) {
+int greedyColor (Graph *G, int i) {
     int j, k, n = G->numVertices, N = G->ancestor->numVertices;
     int *freq = scalloc (1 + N, sizeof (int), 1);
     for (j = 0; j < n; j++) {
@@ -231,7 +239,7 @@ int bruteForceColor (Graph *G, int i) {
             Node *p = G->ancestor->vertex[G->vertex[j].label].adjList;
             memset (1 + freq, 0, N * sizeof (int));
             for (; p; ++freq[G->ancestor->vertex[p->label].color], p = p->next);
-            for (k = 1; k < 1 + i && k < N; k++)
+            for (k = 1; k <= i && k <= N; k++)
                 if (0 == freq[k])
                     break;
             G->ancestor->vertex[G->vertex[j].label].color = k;
@@ -244,7 +252,6 @@ int bruteForceColor (Graph *G, int i) {
 }
 
 int copyColors (Graph *G, Graph *H, int i) {
-
     int j, freq[2] = {0};
     Node *adj = G->adjArray;
     for (j = 0; j < H->numVertices; j++) {
@@ -299,62 +306,72 @@ int kColor (int k, Graph *G, int i) {
         }
 
         int twoUsed = copyColors (G, H, i);
-        i = k == 3 ? i + twoUsed : used;
-        i++;
+        i = k == 3 ? 1 + i + twoUsed : 1 + used;
+        G->ancestor->vertex[sortedVtx[j].label].color = i;
+        G->vertex[sortedVtx[j].index].color = i;
 
         G->ancestor->vertex[sortedVtx[j].label].deleted = 1;
         for (m = 0; m < H->numVertices; m++)
             G->ancestor->vertex[G->adjArray[m].label].deleted = 1;
-
-        G->ancestor->vertex[sortedVtx[j].label].color = i;
-        G->vertex[sortedVtx[j].index].color = i;
         deleteGraph (&H);
     }
 
     free (G->adjArray);
     free (sortedVtx);
-
-    return failure ? 0 : bruteForceColor (G, i);
+    return failure ? 0 : greedyColor (G, i);
 }
 
-Graph *parseGraph (FILE *ifp) {
-    int n = 0x800, len = 0x80000;
+Graph *parseGraph (FILE *ifp, const char attach) {
+    ifp = !ifp ? stdin : ifp;
+    int src, n = 0x800, len = 0x80000;
     Graph *graph = createGraph (n);
     char *line = scalloc (len, sizeof (char), 1);
 
-    while (fgets (line, len, ifp)) {
-        int src, dst;
-        char *pch = tokenize (line);
-        if (1 != sscanf (pch, "%u", &src))
-            continue;
+    switch (attach) {
+        case 0:
+            while (fgets (line, len, ifp)) {
+                int src, dst;
+                char *pch = tokenize (line);
+                if (1 != sscanf (pch, "%u", &src))
+                    continue;
 
-        graph->vertex[src - 1].label = src - 1;
-        if (++graph->numVertices == n)
-            n = reshapeAdjList (graph, n, n << 1);
+                graph->vertex[src - 1].label = src - 1;
+                if (++graph->numVertices == n)
+                    n = reshapeAdjList (graph, n, n << 1);
 
-        for (pch = tokenize (NULL); pch; pch = tokenize (NULL))
+                for (pch = tokenize (NULL); pch; pch = tokenize (NULL))
+                    if (1 == sscanf (pch, "%u", &dst))
+                        addEdge (graph, src - 1, dst - 1, dst - 1);
+            }
+            break;
+        default:
+            for (src = 0; fgets (line, len, ifp); src++) {
+                int dst;
+                char *pch;
 
-            if (1 == sscanf (pch, "%u", &dst))
-                addEdge (graph, src - 1, dst - 1, dst - 1);
+                graph->vertex[src].label = src;
+                if (++graph->numVertices == n)
+                    n = reshapeAdjList (graph, n, n << 1);
+
+                for (pch = tokenize (line); pch; pch = tokenize (NULL))
+                    if (1 == sscanf (pch, "%u", &dst))
+                        addEdge (graph, src, dst, dst);
+            }
+            break;
     }
+
     fclose (ifp);
     free (line);
-
     n = reshapeAdjList (graph, n, graph->numVertices);
-
     return graph->ancestor = graph;
 }
 
 int main (int argc, char *argv[]) {
-
-    if (argc < 2)
-        return fprintf (stderr, "too few arguments!\n");
-
     atexit (timeTaken);
     begin = clock ();
 
-    FILE *ifp = fopen (argv[1], "r");
-    Graph *graph = parseGraph (ifp);
+    FILE *ifp = argc < 2 ? stdin : fopen (argv[1], "r");
+    Graph *graph = parseGraph (ifp, ATTACH);
 
     int i, j = 1, colors;
     do {
@@ -366,6 +383,5 @@ int main (int argc, char *argv[]) {
 
     printColors (colors, graph);
     deleteGraph (&graph);
-
     return 0;
 }
