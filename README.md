@@ -1,4 +1,4 @@
-# Wigderson’s Approximate Graph Coloring
+# Wigderson’s Approximate Graph Coloring Algorithm
 This is a Wigderson’s approximate graph coloring algorithm implementation
 along with a Python wrapper file for invocation of the algorithm's C
 implementation.
