@@ -1,0 +1,8 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+  - family-names: Zoulkarni
+    given-names: Asim
+title: "Wigderson’s Approximate Graph Coloring"
+url: https://github.com/azulqarni/graph-coloring
+date-released: 2022-03-14
