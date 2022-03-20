@@ -32,7 +32,7 @@ grouped by color in one list of lists.
 - Run `setup.sh` to compile and test the above script and programs.
 
 #### Performance Comparison for |V|=8000 (x7.6 Speed-Up)
-Implementation Executed @`Intel(R) Xeon(R) CPU E3-1245 v5 @ 3.50GHz`| Measured Time | Colors Used
-:-------------------------------------------------------------------|---------------|------------:
-Current Wigderson’s in Algorithm C                                  |   7.009s      | 719
-NetworkX (`strategy_largest_first`) in Python                       |   53.277s     | 726
+Implementation Executed @`Intel(R) Xeon(R) CPU E3-1245 v5 @ 3.50GHz`| Measured Time (s) | Colors Used
+:-------------------------------------------------------------------|-------------------|------------:
+Current Wigderson’s in Algorithm C                                  |   7.009           | 719
+NetworkX (`strategy_largest_first`) in Python                       |   53.277          | 726
