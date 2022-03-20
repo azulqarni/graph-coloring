@@ -26,7 +26,7 @@ compatible with the python wrapper is produced, accepting the input graph as
 lines of adjacency lists, where vertices are enumerated with consecutive numbers
 starting from 0.
 - `wrapper.py` contains the Python wrapper script which provides the a function
-for the `gcolorpy` program to be invoked on a graph that is stored in adjacency
+for the compatible program to be invoked on a graph that is stored in adjacency
 matrix format, featuring interprocess communication, which returns vertices
 grouped by color in one list of lists.
 - Run `setup.sh` to compile and test the above script and programs.
