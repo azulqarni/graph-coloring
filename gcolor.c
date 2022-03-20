@@ -319,6 +319,7 @@ int kColor (int k, Graph *G, int i) {
         i = k == 3 ? i + twoUsed : used;
         i++;
 
+        G->ancestor->vertex[sortedVtx[j].label].deleted = 1;
         for (m = 0; m < H->numVertices; m++)
             G->ancestor->vertex[G->adjArray[m].label].deleted = 1;
 
