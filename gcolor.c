@@ -34,7 +34,7 @@
 void *scalloc (int len, size_t size, const char fun) {
     void *p = fun ? malloc (len * size) : calloc (len, size);
     if (!p) {
-        perror ("scalloc: Out of memory");
+        fprintf (stderr, "%calloc: Out of memory", fun ? 'm' : 'c');
         exit (1);
     }
     return p;
@@ -239,9 +239,7 @@ int greedyColor (Graph *G, int i) {
             Node *p = G->ancestor->vertex[G->vertex[j].label].adjList;
             memset (1 + freq, 0, N * sizeof (int));
             for (; p; ++freq[G->ancestor->vertex[p->label].color], p = p->next);
-            for (k = 1; k <= i && k <= N; k++)
-                if (0 == freq[k])
-                    break;
+            for (k = 1; k <= i && k <= N && freq[k]; k++);
             G->ancestor->vertex[G->vertex[j].label].color = k;
             G->vertex[j].color = k;
             i += k == 1 + i;
@@ -344,6 +342,7 @@ Graph *parseGraph (FILE *ifp, const char attach) {
                         addEdge (graph, src - 1, dst - 1, dst - 1);
             }
             break;
+
         default:
             for (src = 0; fgets (line, len, ifp); src++) {
                 int dst;
@@ -377,8 +376,7 @@ int main (int argc, char *argv[]) {
     do {
         j = min(j << 1, graph->numVertices);
         colors = kColor (j, graph, 1);
-        if (!colors)
-            for (i = 0; i < graph->numVertices; graph->vertex[i++].color = 0);
+        for (i = 0; !colors && i < graph->numVertices; graph->vertex[i++].color = 0);
     } while (!colors && j < graph->numVertices);
 
     printColors (colors, graph);
