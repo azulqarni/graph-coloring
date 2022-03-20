@@ -21,7 +21,7 @@ This input should be interpreted as follows: the undirected edges of G are
 following the source vertex are in arbitrary order. The output consists of
 vertices grouped by color, with all vertices assigned with the same color
 printed in the same line of the output. In the first line, the number of colors
-used is printed.If `gcolor.c` is compiled  with `-DATTACHED` an executable
+used is printed. If `gcolor.c` is compiled  with `-DATTACHED` an executable
 compatible with the python wrapper is produced, accepting the input graph as
 lines of adjacency lists, where vertices are enumerated with consecutive umbers
 starting from 0.
