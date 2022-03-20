@@ -158,23 +158,6 @@ void addEdge (Graph* graph, int s, int d, int idx) {
     graph->vertex[s].degree++;
 }
 
-void printGraph (Graph* graph) {
-    int v;
-    puts ("<<<<<<<<<<<");
-    printf ("D(Vtx_Label)=Deg <--> Vtx_Label[Color]: ");
-    printf ("Adj{Vtx_Label(Adj_Vtx_Idx)}\n");
-    for (v = 0; v < graph->numVertices; v++) {
-        Node* p = graph->vertex[v].adjList;
-        printf ("D(%2u)=%2u <--> ",
-                1 + graph->vertex[v].label, graph->vertex[v].degree);
-        for (printf("%2u[%2u]:%c", 1 + graph->vertex[v].label,
-                    graph->vertex[v].color, p ? ' ' : '\n'); p; p = p->next)
-            printf("%2u(%2u)%c",
-                    1 + p->label, 1 + p->index, p->next ? ' ' : '\n');
-    }
-    puts (">>>>>>>>>>>");
-}
-
 void printColors (int colors, Graph* G) {
     printf ("%d", colors);
     if (G && G->numVertices && colors) {
