@@ -28,7 +28,7 @@ int main (int argc, char *argv[]) {
     srand(time(NULL));
     for (i = 0; i < N; i++)
         for (j = i; j < N; j++)
-			//arr[j][i] = arr[i][j] = j == i ? 0 : rand() % 10 < 3;
+            //arr[j][i] = arr[i][j] = j == i ? 0 : rand() % 10 < 3;
             arr[j][i] = arr[i][j] = j == i ? 0 : rand() % 2;
 
     FILE *fp = TXT ? fopen ("graph.txt", "w") : stdout;
