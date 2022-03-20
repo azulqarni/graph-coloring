@@ -32,7 +32,7 @@ grouped by color in one list of lists.
 - Run `setup.sh` to compile and test the above script and programs.
 
 #### Performance
-speed-up (vs NetworkX) @`Intel(R) Xeon(R) CPU E3-1245 v5 @ 3.50GHz` |   x7.6      || Colors Used
-:-------------------------------------------------------------------|-------------||------------:
-Current implementation in C  (Measured time)                        |   53.277s   || 726
-Using NetworkX (`strategy_largest_first`) in Python (Measured time) |   7.009s    || 719
+Comparison (vs NetworkX) @`Intel(R) Xeon(R) CPU E3-1245 v5 @ 3.50GHz` |   x7.6      | Colors Used
+:---------------------------------------------------------------------|-------------|------------:
+Current implementation in C  (Measured time)                          |   53.277s   | 726
+Using NetworkX (`strategy_largest_first`) in Python (Measured time)   |   7.009s    | 719
