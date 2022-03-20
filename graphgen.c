@@ -12,6 +12,7 @@
 #include <time.h>
 #include <stdlib.h>
 
+#define COINTOSSING 1
 #ifndef TXT
 #define TXT 0
 #else
@@ -28,8 +29,11 @@ int main (int argc, char *argv[]) {
     srand(time(NULL));
     for (i = 0; i < N; i++)
         for (j = i; j < N; j++)
-            //arr[j][i] = arr[i][j] = j == i ? 0 : rand() % 10 < 3;
+#if COINTOSSING
             arr[j][i] = arr[i][j] = j == i ? 0 : rand() % 2;
+#else
+            arr[j][i] = arr[i][j] = j == i ? 0 : rand() % 10 < 3;
+#endif
 
     FILE *fp = TXT ? fopen ("graph.txt", "w") : stdout;
     for (i = 0; i < N; i++)
