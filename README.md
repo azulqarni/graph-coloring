@@ -31,7 +31,7 @@ matrix format, featuring interprocess communication, which returns vertices
 grouped by color in one list of lists.
 - Run `setup.sh` to compile and test the above script and programs.
 
-#### Performance Comparison for |V|=8000 (x7.64 Speed-Up)
+#### Performance Comparison for Random Graph with |V|=8000 (x7.64 Speed-Up)
 Implementation @`Intel(R) Xeon(R) CPU E3-1245 v5 @ 3.50GHz`| Measured Time (s) | Colors Returned
 :----------------------------------------------------------|-------------------|----------------:
 Current Wigderson’s in Algorithm C                         |    6.976          | 726
