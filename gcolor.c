@@ -1,25 +1,30 @@
+/*
+ ============================================================================
+ Name		 : gcolor.c
+ Author		 : Asim Zoulkarni
+ Version	 : Standalone Adjacency List-based Implementation
+ Copyright	 : All rights reserved
+ Description : Approximate Graph Coloring in C, Ansi-style
+ ============================================================================
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
 #include <math.h>
 
+#ifndef ATTACH
+#define ATTACH 0
+#else
+#undef ATTACH
+#define ATTACH 1
+#endif
 #define tokenize(x) strtok(x, " \n\r")
-#define max(a,b) \
-    ({ __typeof__ (a) _a = (a); \
-     __typeof__ (b) _b = (b); \
-     _a > _b ? _a : _b; })
 #define min(a,b) \
     ({ __typeof__ (a) _a = (a); \
      __typeof__ (b) _b = (b); \
      _a < _b ? _a : _b; })
-
-#ifndef ATTACH
-#define ATTACH 0
-#else
-#undef  ATTACH
-#define ATTACH 1
-#endif
 
 void *scalloc (int len, size_t size, const char fun) {
     void *p = fun ? malloc (len * size) : calloc (len, size);
@@ -200,11 +205,13 @@ int BFS (Graph *G, int V, int offset) {
         Node vtx = deQueue (q), *p;
         for (p = G->vertex[vtx.index].adjList; p; p = p->next) {
             if (0 == G->vertex[p->index].color) {
+                failure |= 1 << 1;
                 G->vertex[p->index].color = offset + 1 - vtx.label;
+                G->ancestor->vertex[p->label].color = offset + 1 - vtx.label;
                 enQueue (q, 1 - vtx.label, p->index);
             } else if (offset + vtx.label == G->vertex[p->index].color) {
                 for (; q->front; deQueue (q));
-                return failure = 1;
+                return failure |= 1;
             }
         }
     }
@@ -213,10 +220,13 @@ int BFS (Graph *G, int V, int offset) {
 
 int twoColor (Graph *G, int i) {
     int j, failure = 0;
-    for (j = 0; j < G->numVertices; j++)
-        if (0 == G->vertex[j].color)
-            if (BFS (G, j, i))
-                return failure = 1;
+    for (j = 0; j < G->numVertices; j++) {
+        if (0 == G->vertex[j].color) {
+            failure = BFS (G, j, i);
+            if (failure & 1)
+                return failure;
+        }
+    }
     return failure;
 }
 
@@ -244,13 +254,13 @@ int kColor (int k, Graph *G, int i) {
 
     if (k <= 2) {
         failure |= twoColor (G, i);
-        return failure ? 0 : 2;
+        return failure & 1 ? 0 : 1 + (failure >> 1);
     }
 
     if (k >= G->numVertices) {
         int j;
         for (j = i; j < G->numVertices; G->vertex[j].color = j, j++);
-        return failure ? 0 : j;
+        return failure & 1 ? 0 : j;
     }
 
     int j, m, n = G->numVertices;
@@ -261,8 +271,8 @@ int kColor (int k, Graph *G, int i) {
     G->adjArray = scalloc (sortedVtx[0].degree, sizeof (Node), 1);
 
     double exp = 1 - 1. / (k - 1);
-    int val = (int) ceil (pow (n, exp));
-    for (j = 0; j < n && sortedVtx[j].degree >= val; j++) {
+    int fun = (int) ceil (pow (n, exp));
+    for (j = 0; j < n && sortedVtx[j].degree >= fun; j++) {
         if (G->ancestor->vertex[sortedVtx[j].label].deleted)
             continue;
 
@@ -274,13 +284,13 @@ int kColor (int k, Graph *G, int i) {
         Graph *H = subgraphInduced (G, m);
         i = 1 + kColor (k - 1, H, i);
 
-        if (failure) {
+        if (failure & 1) {
             deleteGraph (&H);
             break;
         }
 
-        G->vertex[sortedVtx[j].index].color = i;
         G->ancestor->vertex[sortedVtx[j].label].color = i;
+        G->vertex[sortedVtx[j].index].color = i;
         G->ancestor->vertex[sortedVtx[j].label].deleted = 1;
         for (m = 0; m < H->numVertices; m++)
             G->ancestor->vertex[G->adjArray[m].label].deleted = 1;
@@ -289,7 +299,7 @@ int kColor (int k, Graph *G, int i) {
 
     free (G->adjArray);
     free (sortedVtx);
-    return failure ? 0 : greedyColor (G, i);
+    return failure & 1 ? 0 : greedyColor (G, i);
 }
 
 Graph *parseGraph (FILE *ifp, const char attach) {
@@ -315,7 +325,6 @@ Graph *parseGraph (FILE *ifp, const char attach) {
                         addEdge (graph, src - 1, dst - 1, dst - 1);
             }
             break;
-
         default:
             for (src = 0; fgets (line, len, ifp); src++) {
                 int dst;
@@ -347,7 +356,7 @@ int main (int argc, char *argv[]) {
 
     int i, j = 1, colors;
     do {
-        j = min(j << 1, graph->numVertices);
+        j = min (j << 1, graph->numVertices);
         colors = kColor (j, graph, 1);
         for (i = 0; !colors && i < graph->numVertices; graph->vertex[i++].color = 0);
     } while (!colors && j < graph->numVertices);
