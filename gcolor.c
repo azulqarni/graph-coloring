@@ -222,7 +222,7 @@ int twoColor (Graph *G, int i) {
     int j, failure = 0;
     for (j = 0; j < G->numVertices; j++) {
         if (0 == G->vertex[j].color) {
-            failure = BFS (G, j, i);
+            failure |= BFS (G, j, i);
             if (failure & 1)
                 return failure;
         }
@@ -253,7 +253,7 @@ int kColor (int k, Graph *G, int i) {
     failure ^= G == G->ancestor ? failure : 0;
 
     if (k <= 2) {
-        failure |= twoColor (G, i);
+        failure = twoColor (G, i);
         return failure & 1 ? 0 : 1 + (failure >> 1);
     }
 
