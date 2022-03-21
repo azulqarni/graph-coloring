@@ -4,7 +4,6 @@
 #include <time.h>
 #include <math.h>
 
-#define DEBUG 0
 #define tokenize(x) strtok(x, " \n\r")
 #define max(a,b) \
     ({ __typeof__ (a) _a = (a); \
