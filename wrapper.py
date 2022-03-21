@@ -34,7 +34,6 @@ def graphColoring (matrix, N):
     proc.stdin.close()
 
     colors=[]
-    line = proc.stdout.readline()
     while True:
         line = proc.stdout.readline()
         if not line:

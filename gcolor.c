@@ -1,10 +1,10 @@
 /*
  ============================================================================
  Name        : gcolor.c
- Author      : Asim Zoulkarni
+ Author      : Asim
  Version     : Standalone Adjacency List-based Implementation
  Copyright   : All rights reserved
- Description : Approximate Graph Coloring in C, Ansi-style
+ Description : Graph Coloring in C, Ansi-style
  ============================================================================
 */
 
@@ -14,17 +14,22 @@
 #include <time.h>
 #include <math.h>
 
-#ifndef ATTACH
-#define ATTACH 0
-#else
-#undef ATTACH
-#define ATTACH 1
-#endif
 #define tokenize(x) strtok(x, " \n\r")
+#define max(a,b) \
+    ({ __typeof__ (a) _a = (a); \
+     __typeof__ (b) _b = (b); \
+     _a > _b ? _a : _b; })
 #define min(a,b) \
     ({ __typeof__ (a) _a = (a); \
      __typeof__ (b) _b = (b); \
      _a < _b ? _a : _b; })
+
+#ifndef ATTACH
+#define ATTACH 0
+#else
+#undef  ATTACH
+#define ATTACH 1
+#endif
 
 void *scalloc (int len, size_t size, const char fun) {
     void *p = fun ? malloc (len * size) : calloc (len, size);
@@ -98,7 +103,7 @@ Node *createNode (int label, int index) {
 }
 
 void enQueue(Queue* q, int color, int vertex) {
-    Node* temp = createNode(color, vertex);
+    Node* temp = createNode (color, vertex);
     if (NULL == q->rear) {
         q->front = q->rear = temp;
         return;
@@ -248,6 +253,19 @@ int greedyColor (Graph *G, int i) {
     return i;
 }
 
+int copyColors (Graph *G, Graph *H, int i) {
+    int j, freq[2] = {0};
+    Node *adj = G->adjArray;
+    for (j = 0; j < H->numVertices; j++) {
+        if (0 == G->vertex[adj[j].index].color) {
+            G->ancestor->vertex[adj[j].label].color = H->vertex[j].color;
+            G->vertex[adj[j].index].color = H->vertex[j].color;
+            freq[(H->vertex[j].color - i) & 1]++;
+        }
+    }
+    return !!freq[0] + !!freq[1];
+}
+
 int kColor (int k, Graph *G, int i) {
     static int failure = 0;
     failure ^= G == G->ancestor ? failure : 0;
@@ -271,8 +289,8 @@ int kColor (int k, Graph *G, int i) {
     G->adjArray = scalloc (sortedVtx[0].degree, sizeof (Node), 1);
 
     double exp = 1 - 1. / (k - 1);
-    int fun = (int) ceil (pow (n, exp));
-    for (j = 0; j < n && sortedVtx[j].degree >= fun; j++) {
+    int val = (int) ceil (pow (n, exp));
+    for (j = 0; j < n && sortedVtx[j].degree >= val; j++) {
         if (G->ancestor->vertex[sortedVtx[j].label].deleted)
             continue;
 
@@ -282,15 +300,18 @@ int kColor (int k, Graph *G, int i) {
                 G->adjArray[m++] = *p;
 
         Graph *H = subgraphInduced (G, m);
-        i = 1 + kColor (k - 1, H, i);
+        int used = kColor (k - 1, H, i);
 
         if (failure & 1) {
             deleteGraph (&H);
             break;
         }
 
-        G->vertex[sortedVtx[j].index].color = i;
+        int twoUsed = copyColors (G, H, i);
+        i = k == 3 ? 1 + i + twoUsed : 1 + used;
         G->ancestor->vertex[sortedVtx[j].label].color = i;
+        G->vertex[sortedVtx[j].index].color = i;
+
         G->ancestor->vertex[sortedVtx[j].label].deleted = 1;
         for (m = 0; m < H->numVertices; m++)
             G->ancestor->vertex[G->adjArray[m].label].deleted = 1;
@@ -325,6 +346,7 @@ Graph *parseGraph (FILE *ifp, const char attach) {
                         addEdge (graph, src - 1, dst - 1, dst - 1);
             }
             break;
+
         default:
             for (src = 0; fgets (line, len, ifp); src++) {
                 int dst;
@@ -356,7 +378,7 @@ int main (int argc, char *argv[]) {
 
     int i, j = 1, colors;
     do {
-        j = min (j << 1, graph->numVertices);
+        j = min(j << 1, graph->numVertices);
         colors = kColor (j, graph, 1);
         for (i = 0; !colors && i < graph->numVertices; graph->vertex[i++].color = 0);
     } while (!colors && j < graph->numVertices);
