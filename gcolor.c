@@ -66,6 +66,9 @@ typedef struct Graph {
 
 clock_t begin;
 void timeTaken (void) {
+#if ATTACH
+    return;
+#endif
     clock_t end = clock ();
     printf("Time taken = %lf\n", ((double) end - begin) / CLOCKS_PER_SEC);
 }
