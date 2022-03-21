@@ -197,7 +197,7 @@ Graph *subgraphInduced (Graph *G, int N) {
 }
 
 int BFS (Graph *G, int V, int offset) {
-    int color = 0, failure = 0;
+    int color = 0, result = 0;
     Queue* q = scalloc (1, sizeof (Queue), 0);
     G->vertex[V].color = offset + color;
     G->ancestor->vertex[G->vertex[V].label].color = offset + color;
@@ -205,29 +205,29 @@ int BFS (Graph *G, int V, int offset) {
         Node vtx = deQueue (q), *p;
         for (p = G->vertex[vtx.index].adjList; p; p = p->next) {
             if (0 == G->vertex[p->index].color) {
-                failure |= 1 << 1;
+                result |= 1 << 1;
                 G->vertex[p->index].color = offset + 1 - vtx.label;
                 G->ancestor->vertex[p->label].color = offset + 1 - vtx.label;
                 enQueue (q, 1 - vtx.label, p->index);
             } else if (offset + vtx.label == G->vertex[p->index].color) {
                 for (; q->front; deQueue (q));
-                return failure |= 1;
+                return result |= 1;
             }
         }
     }
-    return failure;
+    return result;
 }
 
 int twoColor (Graph *G, int i) {
-    int j, failure = 0;
+    int j, result = 0;
     for (j = 0; j < G->numVertices; j++) {
         if (0 == G->vertex[j].color) {
-            failure |= BFS (G, j, i);
-            if (failure & 1)
-                return failure;
+            result |= BFS (G, j, i);
+            if (result & 1)
+                return result;
         }
     }
-    return failure;
+    return result;
 }
 
 int greedyColor (Graph *G, int i) {
@@ -249,18 +249,18 @@ int greedyColor (Graph *G, int i) {
 }
 
 int kColor (int k, Graph *G, int i) {
-    static int failure = 0;
-    failure ^= G == G->ancestor ? failure : 0;
+    static int result = 0;
+    result ^= G == G->ancestor ? result : 0;
 
     if (k <= 2) {
-        failure = twoColor (G, i);
-        return failure & 1 ? 0 : 1 + (failure >> 1);
+        result = twoColor (G, i);
+        return result & 1 ? 0 : 1 + (result >> 1);
     }
 
     if (k >= G->numVertices) {
         int j;
         for (j = i; j < G->numVertices; G->vertex[j].color = j, j++);
-        return failure & 1 ? 0 : j;
+        return result & 1 ? 0 : j;
     }
 
     int j, m, n = G->numVertices;
@@ -284,7 +284,7 @@ int kColor (int k, Graph *G, int i) {
         Graph *H = subgraphInduced (G, m);
         i = 1 + kColor (k - 1, H, i);
 
-        if (failure & 1) {
+        if (result & 1) {
             deleteGraph (&H);
             break;
         }
@@ -299,7 +299,7 @@ int kColor (int k, Graph *G, int i) {
 
     free (G->adjArray);
     free (sortedVtx);
-    return failure & 1 ? 0 : greedyColor (G, i);
+    return result & 1 ? 0 : greedyColor (G, i);
 }
 
 Graph *parseGraph (FILE *ifp, const char attach) {
