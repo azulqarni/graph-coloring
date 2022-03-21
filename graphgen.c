@@ -1,7 +1,7 @@
 /*
  ============================================================================
  Name        : graphgen.c
- Author      : Asim
+ Author      : Asim Zoulkarni
  Version     : Producing Adjacency Lists for Standalone Version
  Copyright   : All rights reserved
  Description : Undirected Graph Generator in C, Ansi-style
