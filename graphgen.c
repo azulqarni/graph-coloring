@@ -9,8 +9,8 @@
 */
 
 #include <stdio.h>
-#include <time.h>
 #include <stdlib.h>
+#include <time.h>
 
 #define COINTOSSING 1
 #ifndef TXT

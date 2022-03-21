@@ -23,8 +23,8 @@ vertices grouped by color, with all vertices assigned with the same color
 printed in the same line of the output. In the first line, the number of colors
 used is printed. If `gcolor.c` is compiled  with `-DATTACHED` an executable
 compatible with the python wrapper is produced, accepting the input graph as
-lines of adjacency lists, where vertices are enumerated with consecutive numbers
-starting from 0.
+lines of adjacency lists, where vertices are enumerated with consecutive
+numbers starting from 0.
 - `wrapper.py` contains the Python wrapper script which provides the a function
 for the compatible program to be invoked on a graph that is stored in adjacency
 matrix format, featuring interprocess communication, which returns vertices

@@ -1,12 +1,12 @@
 /*
  ============================================================================
-Name        : gcolor.c
-Author      : Asim Zoulkarni
-Version     : Standalone Adjacency List-based Implementation
-Copyright   : All rights reserved
-Description : Approximate Graph Coloring in C, Ansi-style
-============================================================================
- */
+ Name        : gcolor.c
+ Author      : Asim Zoulkarni
+ Version     : Standalone Adjacency List-based Implementation
+ Copyright   : All rights reserved
+ Description : Approximate Graph Coloring in C, Ansi-style
+ ============================================================================
+*/
 
 #include <stdio.h>
 #include <stdlib.h>
