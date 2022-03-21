@@ -276,12 +276,12 @@ int kColor (int k, Graph *G, int i) {
             break;
         }
 
+        G->ancestor->vertex[sortedVtx[j].label].color = i;
+        G->vertex[sortedVtx[j].index].color = i;
+
         G->ancestor->vertex[sortedVtx[j].label].deleted = 1;
         for (m = 0; m < H->numVertices; m++)
             G->ancestor->vertex[G->adjArray[m].label].deleted = 1;
-
-        G->ancestor->vertex[sortedVtx[j].label].color = i;
-        G->vertex[sortedVtx[j].index].color = i;
         deleteGraph (&H);
     }
 
