@@ -1,19 +1,10 @@
-/*
- ============================================================================
- Name        : gcolor.c
- Author      : Asim
- Version     : Standalone Adjacency List-based Implementation
- Copyright   : All rights reserved
- Description : Graph Coloring in C, Ansi-style
- ============================================================================
-*/
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
 #include <math.h>
 
+#define DEBUG 0
 #define tokenize(x) strtok(x, " \n\r")
 #define max(a,b) \
     ({ __typeof__ (a) _a = (a); \
@@ -76,9 +67,6 @@ typedef struct Graph {
 
 clock_t begin;
 void timeTaken (void) {
-#if ATTACH
-    return;
-#endif
     clock_t end = clock ();
     printf("Time taken = %lf\n", ((double) end - begin) / CLOCKS_PER_SEC);
 }
@@ -103,7 +91,7 @@ Node *createNode (int label, int index) {
 }
 
 void enQueue(Queue* q, int color, int vertex) {
-    Node* temp = createNode (color, vertex);
+    Node* temp = createNode(color, vertex);
     if (NULL == q->rear) {
         q->front = q->rear = temp;
         return;
@@ -210,13 +198,11 @@ int BFS (Graph *G, int V, int offset) {
         Node vtx = deQueue (q), *p;
         for (p = G->vertex[vtx.index].adjList; p; p = p->next) {
             if (0 == G->vertex[p->index].color) {
-                failure |= 1 << 1;
                 G->vertex[p->index].color = offset + 1 - vtx.label;
-                G->ancestor->vertex[p->label].color = offset + 1 - vtx.label;
                 enQueue (q, 1 - vtx.label, p->index);
             } else if (offset + vtx.label == G->vertex[p->index].color) {
                 for (; q->front; deQueue (q));
-                return failure |= 1;
+                return failure = 1;
             }
         }
     }
@@ -225,13 +211,10 @@ int BFS (Graph *G, int V, int offset) {
 
 int twoColor (Graph *G, int i) {
     int j, failure = 0;
-    for (j = 0; j < G->numVertices; j++) {
-        if (0 == G->vertex[j].color) {
-            failure = BFS (G, j, i);
-            if (failure & 1)
-                return failure;
-        }
-    }
+    for (j = 0; j < G->numVertices; j++)
+        if (0 == G->vertex[j].color)
+            if (BFS (G, j, i))
+                return failure = 1;
     return failure;
 }
 
@@ -253,32 +236,19 @@ int greedyColor (Graph *G, int i) {
     return i;
 }
 
-int copyColors (Graph *G, Graph *H, int i) {
-    int j, freq[2] = {0};
-    Node *adj = G->adjArray;
-    for (j = 0; j < H->numVertices; j++) {
-        if (0 == G->vertex[adj[j].index].color) {
-            G->ancestor->vertex[adj[j].label].color = H->vertex[j].color;
-            G->vertex[adj[j].index].color = H->vertex[j].color;
-            freq[(H->vertex[j].color - i) & 1]++;
-        }
-    }
-    return !!freq[0] + !!freq[1];
-}
-
 int kColor (int k, Graph *G, int i) {
     static int failure = 0;
     failure ^= G == G->ancestor ? failure : 0;
 
     if (k <= 2) {
         failure |= twoColor (G, i);
-        return failure & 1 ? 0 : 1 + (failure >> 1);
+        return failure ? 0 : 2;
     }
 
     if (k >= G->numVertices) {
         int j;
         for (j = i; j < G->numVertices; G->vertex[j].color = j, j++);
-        return failure & 1 ? 0 : j;
+        return failure ? 0 : j;
     }
 
     int j, m, n = G->numVertices;
@@ -300,27 +270,25 @@ int kColor (int k, Graph *G, int i) {
                 G->adjArray[m++] = *p;
 
         Graph *H = subgraphInduced (G, m);
-        int used = kColor (k - 1, H, i);
+        i = 1 + kColor (k - 1, H, i);
 
-        if (failure & 1) {
+        if (failure) {
             deleteGraph (&H);
             break;
         }
 
-        int twoUsed = copyColors (G, H, i);
-        i = k == 3 ? 1 + i + twoUsed : 1 + used;
-        G->ancestor->vertex[sortedVtx[j].label].color = i;
-        G->vertex[sortedVtx[j].index].color = i;
-
         G->ancestor->vertex[sortedVtx[j].label].deleted = 1;
         for (m = 0; m < H->numVertices; m++)
             G->ancestor->vertex[G->adjArray[m].label].deleted = 1;
+
+        G->ancestor->vertex[sortedVtx[j].label].color = i;
+        G->vertex[sortedVtx[j].index].color = i;
         deleteGraph (&H);
     }
 
     free (G->adjArray);
     free (sortedVtx);
-    return failure & 1 ? 0 : greedyColor (G, i);
+    return failure ? 0 : greedyColor (G, i);
 }
 
 Graph *parseGraph (FILE *ifp, const char attach) {
